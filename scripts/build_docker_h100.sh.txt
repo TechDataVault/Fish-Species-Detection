@@ -1,0 +1,98 @@
+# Dockerfile.h100 (H100 Optimized)
+
+```dockerfile
+# ================================
+# H100 Optimized Dockerfile
+# CUDA 12.x + PyTorch 2.x + MMDetection
+# ================================
+
+FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04
+
+# -------------------------------
+# Environment Variables
+# -------------------------------
+ENV DEBIAN_FRONTEND=noninteractive
+
+# H100 (SM90) support
+ENV TORCH_CUDA_ARCH_LIST="9.0" \
+    TORCH_NVCC_FLAGS="-Xfatbin -compress-all" \
+    FORCE_CUDA="1" \
+    NCCL_P2P_DISABLE=0 \
+    NCCL_IB_DISABLE=0
+
+# -------------------------------
+# System Dependencies
+# -------------------------------
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    curl \
+    vim \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    ninja-build \
+    libglib2.0-0 \
+    libsm6 \
+    libxrender-dev \
+    libxext6 \
+    ffmpeg \
+ && rm -rf /var/lib/apt/lists/*
+
+# Set python alias
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# Upgrade pip
+RUN pip install --upgrade pip setuptools wheel
+
+# -------------------------------
+# Install PyTorch (CUDA 12.1)
+# -------------------------------
+RUN pip install torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cu121
+
+# -------------------------------
+# Install OpenMMLab stack
+# -------------------------------
+RUN pip install openmim
+
+# Install MMEngine + MMCV (compatible with PyTorch 2.x)
+RUN mim install "mmengine>=0.10.0"
+RUN mim install "mmcv>=2.1.0"
+
+# -------------------------------
+# Install MMDetection
+# -------------------------------
+RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection
+
+WORKDIR /mmdetection
+
+RUN pip install -e .
+
+# -------------------------------
+# Optional: Install extra libs
+# -------------------------------
+RUN pip install \
+    opencv-python \
+    matplotlib \
+    seaborn \
+    scikit-learn \
+    pillow
+
+# -------------------------------
+# Optional: Flash Attention (H100 speed boost)
+# -------------------------------
+# Uncomment below for faster training
+# RUN pip install flash-attn --no-build-isolation
+
+# -------------------------------
+# Set working directory
+# -------------------------------
+WORKDIR /workspace
+
+# -------------------------------
+# Default command
+# -------------------------------
+CMD ["/bin/bash"]
+```

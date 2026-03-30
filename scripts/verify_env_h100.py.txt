@@ -1,0 +1,27 @@
+python - <<EOF
+import torch
+import numpy as np
+import mmcv
+from mmcv.ops import sigmoid_focal_loss
+
+# GPU info
+print("GPU:", torch.cuda.get_device_name(0))
+print("CUDA Available:", torch.cuda.is_available())
+
+# Versions
+print("Torch:", torch.__version__)
+print("NumPy:", np.__version__)
+print("MMCV:", mmcv.__version__)
+
+# Dummy data
+pred = torch.randn(8, 5, device="cuda")
+
+# Correct target (same shape + float)
+target = torch.randint(0, 2, (8, 5), device="cuda").float()
+
+# Compute loss
+loss = sigmoid_focal_loss(pred, target)
+
+print("Loss:", loss.mean().item())
+print("✅ MMCV CUDA ops OK on SM90 (H100)")
+EOF
