@@ -597,13 +597,9 @@ Usage pattern is similar to `batch_infer_swin.py`, with additional text config (
 
 ### 9.1 Repository License
 
-Copyright (c) 2026 Frontier Business System.
 
-All rights reserved.
+This repository is provided to \<CMFRI\> under the terms of the Master Services Agreement and associated Statement(s) of Work between Frontier Business Systems and \<CMFRI\>. 
 
-This repository is provided to \<CMFRI\> under the terms of the Master Services Agreement and associated Statement(s) of Work between Frontier Business Systems and \<CMFRI\>. No part of this software may be redistributed, sublicensed, or used outside that agreement without prior written consent from Frontier Business Sytemss.
-
-Unless explicitly stated otherwise in a file header, all code in this repository is owned by TechDataVault.
 
 ### 9.2 Third‑Party Components
 
@@ -614,7 +610,7 @@ This project depends on several third‑party libraries and tools which are **no
 - **Ultralytics YOLOv8** – Detection model used in the optional auto‑labelling pipeline (AGPL‑3.0 or commercial Enterprise license).
 - **PyTorch** and related ecosystem packages (CUDA, cuDNN, etc.).
 
-Before deploying or redistributing any system built from this repository, ensure that your use of these third‑party components is compatible with their respective licenses and, where applicable, that you have obtained appropriate commercial licenses.
+Before deploying or redistributing any system built from this repository, ensure that your use of these third‑party components is compatible with their respective licenses and, where applicable, that you have obtained appropriate commercial licenses with orginal software/framework provider
 
 ---
 
