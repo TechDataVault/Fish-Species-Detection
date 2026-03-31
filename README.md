@@ -199,6 +199,21 @@ git clone https://github.com/open-mmlab/mmdetection.git
 cd mmdetection
 git checkout v3.3.0   # align with configs
 ```
+## Model Download link used here
+The correct download URLs for the pretrained DINO models based on MMDetection v3.0 
+are: 
+1. For ResNet-50 4scale improved 12 epochs (recommended checkpoint for your 
+ResNet config): 
+https://download.openmmlab.com/mmdetection/v3.0/dino/dino-4scale_r50_8xb2
+12e_coco/dino-4scale_r50_8xb2-12e_coco_20221202_182705-55b2bba2.pth 
+
+2. For Swin-Large 5scale 12 epochs (recommended checkpoint for your Swin-L config): 
+https://download.openmmlab.com/mmdetection/v3.0/dino/dino-5scale_swin
+l_8xb2-12e_coco/dino-5scale_swin-l_8xb2-12e_coco_20230228_072924
+a654145f.pth
+
+   Two base-model are present at the location:
+   /home/ubuntu/mm-det/mmdetection/checkpoints (after you have cloned the mmdetection github repo)
 
 ### 4.2 Build Docker Image (Generic / L40S)
 
@@ -549,8 +564,8 @@ Usage pattern is similar to `batch_infer_swin.py`, with additional text config (
 
 7. **Train models**  
    - ResNet‑50: `dino_r50_24e.py`  
-   - Swin‑L 30‑species: `A3_dino_swin_l_60e.py`  
-   - Swin‑L 110‑species (H100): `30speciesset_dino_swin_l_36e.py`
+   - Swin‑L 30‑species(L40): `A3_dino_swin_l_60e.py`  
+   - Swin‑L 30‑species (H100): `30speciesset_dino_swin_l_36e.py`
 
 8. **Evaluate and export best checkpoints**  
    - Use `test30species.py` and `tools/test.py`.
