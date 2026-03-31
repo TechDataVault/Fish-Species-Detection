@@ -10,7 +10,13 @@ End‑to‑end pipeline for **marine fish species detection** and **open‑set r
 - FastAPI inference server with 3‑signal OSR ensemble
 - (Optional) Text‑grounded multimodal detection
 
-This README for someone **new to the project** who has GPU resources and wants to reproduce the full pipeline.
+This README is for someone **new to the project** who has GPU resources and wants to reproduce the full pipeline.
+
+---
+
+## 0. End‑to‑End Pipeline Overview
+
+![End‑to‑end training and deployment pipeline](https://agi-prod-file-upload-public-main-use1.s3.amazonaws.com/1165a966-5338-46c1-8273-19e54ba80e0e)
 
 ---
 
@@ -28,7 +34,7 @@ marine-fish-detection-system/
 ├─ configs/
 │  ├─ dino_r50_24e.py               # 30-species ResNet-50 baseline
 │  ├─ A3_dino_swin_l_60e.py         # 30-species Swin-L on L40S
-│  ├─ 30speciesset_dino_swin_l_36e.py   # 110-species Swin-L on H100
+│  ├─ 30speciesset_dino_swin_l_36e.py   # 30-species Swin-L on H100
 │  └─ test30species.py              # eval config for 30-species Swin-L
 ├─ data_tools/
 │  ├─ auto_label_yolov8_vgg16.py    # YOLOv8 + VGG16 LabelMe autolabeller
@@ -56,7 +62,7 @@ You do **not** need this exact layout, but the README assumes these logical loca
 - Linux machine with:
   - At least one NVIDIA GPU  
     - L40S or similar for 30‑species experiments
-    - H100 (SM90) for 30‑species high‑res training
+    - H100 (SM90) for 30‑species high‑resolution training
 - Disk space for:
   - Raw images + LabelMe JSONs
   - COCO JSONs
@@ -179,10 +185,10 @@ What it does:
   - `val_coco.json`
   - `test_coco.json`
 
-Example default directories from the original experiments:
+Example directory structure from the original experiments (replace with your own):
 
-- Input: `/home/ubuntu/30speciesset` (class‑wise LabelMe)
-- Output: `/home/ubuntu/30spec-con-rec` (COCO JSONs)
+- Input (LabelMe): `/path/to/30speciesset`
+- Output (COCO JSONs): `/path/to/30spec-con-rec`
 
 ---
 
@@ -199,21 +205,26 @@ git clone https://github.com/open-mmlab/mmdetection.git
 cd mmdetection
 git checkout v3.3.0   # align with configs
 ```
-## Model Download link used here
-The correct download URLs for the pretrained DINO models based on MMDetection v3.0 
-are: 
-1. For ResNet-50 4scale improved 12 epochs (recommended checkpoint for your 
-ResNet config): 
-https://download.openmmlab.com/mmdetection/v3.0/dino/dino-4scale_r50_8xb2
-12e_coco/dino-4scale_r50_8xb2-12e_coco_20221202_182705-55b2bba2.pth 
 
-2. For Swin-Large 5scale 12 epochs (recommended checkpoint for your Swin-L config): 
-https://download.openmmlab.com/mmdetection/v3.0/dino/dino-5scale_swin
-l_8xb2-12e_coco/dino-5scale_swin-l_8xb2-12e_coco_20230228_072924
-a654145f.pth
+### Model Download Links
 
-   Two base-model are present at the location:
-   /home/ubuntu/mm-det/mmdetection/checkpoints (after you have cloned the mmdetection github repo)
+The pretrained DINO checkpoints used here (MMDetection v3.0):
+
+1. ResNet‑50, 4‑scale, 12 epochs (base for `dino_r50_24e.py`):  
+   `https://download.openmmlab.com/mmdetection/v3.0/dino/dino-4scale_r50_8xb2-12e_coco/dino-4scale_r50_8xb2-12e_coco_20221202_182705-55b2bba2.pth`
+
+2. Swin‑Large, 5‑scale, 12 epochs (base for Swin‑L configs):  
+   `https://download.openmmlab.com/mmdetection/v3.0/dino/dino-5scale_swin-l_8xb2-12e_coco/dino-5scale_swin-l_8xb2-12e_coco_20230228_072924-a654145f.pth`
+
+After downloading, place them under:
+
+```text
+/path/to/mm-det/mmdetection/checkpoints/
+```
+
+or any directory you mount into the container as `/workspace/mmdetection/checkpoints`.
+
+---
 
 ### 4.2 Build Docker Image (Generic / L40S)
 
@@ -238,7 +249,7 @@ From `mmdetection/`:
 
 ```bash
 bash scripts/build_docker_h100.sh
-# which internally runs:
+# internally:
 # docker build --no-cache -t mmdetection-h100 docker/
 ```
 
@@ -262,8 +273,8 @@ python scripts/verify_env_h100.py
 
 ```bash
 docker run --gpus all --shm-size=8g -it \
-  -v /home/ubuntu/30speciesset:/workspace/fish_coco \
-  -v /home/ubuntu/30spec-con-rec:/workspace/fish_coco_json \
+  -v /path/to/30speciesset:/workspace/fish_coco \
+  -v /path/to/30spec-con-rec:/workspace/fish_coco_json \
   -v $PWD/configs:/workspace/mmdetection/configs \
   -v $PWD/checkpoints:/workspace/mmdetection/checkpoints \
   mmdetection:latest
@@ -338,10 +349,10 @@ H100 container run:
 
 ```bash
 docker run --gpus all --shm-size=8g -it \
-  -v /nv-snapshot/home/ubuntu/30speciesset:/workspace/data \
-  -v /nv-snapshot/home/ubuntu/30spec-con-rec:/workspace/annotations \
-  -v /nv-snapshot/home/ubuntu/mm-det/mmdetection/configs:/workspace/configs \
-  -v /nv-snapshot/home/ubuntu/mm-det/mmdetection/checkpoints:/workspace/checkpoints \
+  -v /path/to/30speciesset:/workspace/data \
+  -v /path/to/30spec-con-rec:/workspace/annotations \
+  -v /path/to/mm-det/mmdetection/configs:/workspace/configs \
+  -v /path/to/mm-det/mmdetection/checkpoints:/workspace/checkpoints \
   mmdetection-h100
 ```
 
@@ -354,7 +365,7 @@ python tools/train.py /workspace/configs/30speciesset_dino_swin_l_36e.py
 This configuration:
 
 - Uses Swin‑L at **384×384** resolution (H100 memory enables this)
-- Larger batch size and extended epochs (up to 80)
+- Larger batch size and extended epochs (up to ~80)
 - Trains on 30 classes
 - Achieved mAP ≈ 0.86, `AP@0.50 ≈ 0.994`, `AR ≈ 0.90` in the original experiments.
 
@@ -530,7 +541,7 @@ It returns presets for stricter / looser / balanced settings.
 
 ## 7. (Optional) Text‑Grounded Multimodal Detection
 
-If you include the multimodal extension, document it briefly:
+If you include the multimodal extension:
 
 - `inference/text_grounded_infer.py` loads:
   - Swin‑L visual backbone features (P3–P7 pyramid)
@@ -564,7 +575,7 @@ Usage pattern is similar to `batch_infer_swin.py`, with additional text config (
 
 7. **Train models**  
    - ResNet‑50: `dino_r50_24e.py`  
-   - Swin‑L 30‑species(L40): `A3_dino_swin_l_60e.py`  
+   - Swin‑L 30‑species (L40S): `A3_dino_swin_l_60e.py`  
    - Swin‑L 30‑species (H100): `30speciesset_dino_swin_l_36e.py`
 
 8. **Evaluate and export best checkpoints**  
@@ -579,6 +590,31 @@ Usage pattern is similar to `batch_infer_swin.py`, with additional text config (
 
 10. **Integrate with UI**  
     - Frontend/React or any client can call `/predict` and display species name or `"unknown"` with explanation.
+
+---
+
+## 9. License and Third‑Party Components
+
+### 9.1 Repository License
+
+Copyright (c) 2026 Frontier Business System.
+
+All rights reserved.
+
+This repository is provided to \<CMFRI\> under the terms of the Master Services Agreement and associated Statement(s) of Work between Frontier Business Systems and \<CMFRI\>. No part of this software may be redistributed, sublicensed, or used outside that agreement without prior written consent from Frontier Business Sytemss.
+
+Unless explicitly stated otherwise in a file header, all code in this repository is owned by TechDataVault.
+
+### 9.2 Third‑Party Components
+
+This project depends on several third‑party libraries and tools which are **not** redistributed in this repository. Users are responsible for installing them separately and complying with their licenses:
+
+- **MMDetection / MMCV / MMEngine** – OpenMMLab object detection framework and dependencies (Apache‑2.0 license).
+- **LabelMe** – Image annotation tool used for bounding‑box labeling.
+- **Ultralytics YOLOv8** – Detection model used in the optional auto‑labelling pipeline (AGPL‑3.0 or commercial Enterprise license).
+- **PyTorch** and related ecosystem packages (CUDA, cuDNN, etc.).
+
+Before deploying or redistributing any system built from this repository, ensure that your use of these third‑party components is compatible with their respective licenses and, where applicable, that you have obtained appropriate commercial licenses.
 
 ---
 
