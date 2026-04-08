@@ -1,0 +1,48 @@
+.dashboard-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard-container {
+  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent for readability */
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 400px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.dashboard-container h1 {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #007BFF;
+  margin-bottom: 40px;
+}
+
+.dashboard-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dashboard-buttons button {
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.dashboard-buttons button:hover {
+  background-color: #0056b3;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
